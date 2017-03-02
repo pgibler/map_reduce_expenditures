@@ -2,8 +2,28 @@
 
 require 'date'
 
+# Get the file to read in. Default to 'transactions.csv'.
+first_arg = ARGV[0]
+
+# If nothing was input or the -h flag was specified, output the usage message.
+if(first_arg.nil? or first_arg == '-h')
+  puts "Usage: map_reduce.rb [-h] <transaction_file>"
+  exit(0)
+end
+
+# The first arg should be treated as a file at this point.
+transaction_file = first_arg
+
+# Return if the file does not exist.
+unless(File.exist?(transaction_file))
+  puts "The specified transaction file does not exist. Did you mean something else?"
+  # Failed to execute properly.
+  exit(1)
+end
+
 # Drop the first line because its just column names.
-daily_expenditures = File.readlines('AccountHistory.csv').drop(1).map do |line|
+# Then iterate the lines and then create a object from each transaction that contains the month it occurred in and how much was spent on the transaction.
+daily_expenditures = File.readlines(transaction_file).drop(1).map do |line|
   
   account_number, post_date, check, description, debit, credit, status, balance = line.split(',')
   
@@ -40,3 +60,6 @@ end
 monthly_expenditures.each_pair do |k,v|
   puts "#{Date::MONTHNAMES[k]} - $#{v.round(2)}"
 end
+
+# It ran successfully.
+exit(0)
